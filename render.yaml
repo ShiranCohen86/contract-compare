@@ -1,7 +1,7 @@
 services:
   # ── Backend API (Node.js Web Service) ────────────────────────────────────────
   - type: web
-    name: contractos-api
+    name: contract-compare-api
     runtime: node
     region: frankfurt
     plan: free
@@ -55,7 +55,7 @@ services:
 
   # ── Frontend (Vite Static Site) ───────────────────────────────────────────────
   - type: web
-    name: contractos-web
+    name: contract-compare-web
     runtime: static
     region: frankfurt
     plan: free

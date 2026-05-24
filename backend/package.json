@@ -1,5 +1,5 @@
 {
-  "name": "contractos-backend",
+  "name": "contract-compare-backend",
   "version": "1.0.0",
   "description": "ContractOS — contract negotiation platform backend API",
   "main": "server.js",
