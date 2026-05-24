@@ -3,6 +3,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
+const fs = require('fs');
 
 const env = require('./config/env');
 const routes = require('./routes');
@@ -57,6 +59,15 @@ if (env.NODE_ENV !== 'production') {
 
 app.use('/api', routes);
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found', path: _req.originalUrl }));
+
+// Serve React frontend in production
+if (env.NODE_ENV === 'production') {
+  const distPath = path.join(__dirname, '../../frontend/dist');
+  if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    app.get('*', (_req, res) => res.sendFile(path.join(distPath, 'index.html')));
+  }
+}
 
 app.use(errorMiddleware);
 
