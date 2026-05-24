@@ -15,8 +15,8 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        // silence deprecation warnings from sass
         quietDeps: true,
+        silenceDeprecations: ['legacy-js-api', 'import', 'global-builtin', 'color-functions'],
       },
     },
   },
