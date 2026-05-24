@@ -1,0 +1,96 @@
+@import '../../styles/global';
+
+.profile-page {
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeInUp 0.3s ease both;
+
+  &__title {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: $color-text;
+    margin-bottom: 4px;
+  }
+}
+
+.profile-section {
+  transition: box-shadow $transition;
+
+  &:hover { box-shadow: $shadow-md; }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: $color-text;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__desc {
+    font-size: 13px;
+    color: $color-muted;
+    margin-bottom: 16px;
+    line-height: 1.6;
+  }
+
+  &--danger {
+    border-color: rgba($color-danger,.25);
+    background: linear-gradient(135deg, #fff5f5 0%, $color-surface 100%);
+
+    h3 { color: $color-danger; }
+  }
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__label {
+    font-size: 13px;
+    color: $color-muted;
+    font-weight: 600;
+    min-width: 80px;
+    letter-spacing: 0.01em;
+  }
+
+  &__value {
+    font-size: 15px;
+    font-weight: 600;
+    color: $color-text;
+  }
+}
+
+.profile-form {
+  max-width: 440px;
+}
+
+.form-success {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: $color-success;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 8px 12px;
+  border-radius: $radius-xs;
+  margin-bottom: 12px;
+  font-weight: 600;
+}

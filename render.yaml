@@ -1,0 +1,74 @@
+services:
+  # ── Backend API (Node.js Web Service) ────────────────────────────────────────
+  - type: web
+    name: contractos-api
+    runtime: node
+    region: frankfurt
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # Render assigns PORT automatically — do not override
+      # - key: PORT
+
+      # ── Required — set manually in Render dashboard ──────────────────────────
+      - key: MONGO_URI
+        sync: false         # MongoDB Atlas connection string
+
+      - key: FRONTEND_URL
+        sync: false         # e.g. https://contractos-web.onrender.com
+
+      # ── Auto-generated secrets ────────────────────────────────────────────────
+      - key: JWT_SECRET
+        generateValue: true
+
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+      # ── Optional ──────────────────────────────────────────────────────────────
+      - key: JWT_EXPIRES_IN
+        value: 15m
+
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 30d
+
+      - key: RESEND_API_KEY
+        sync: false         # optional — for email invites
+
+      - key: EMAIL_FROM
+        value: noreply@contractos.com
+
+      - key: LOG_LEVEL
+        value: info
+
+      - key: AUTO_SEED_IF_EMPTY
+        value: false
+
+      - key: RATE_LIMIT_MAX
+        value: "200"
+
+  # ── Frontend (Vite Static Site) ───────────────────────────────────────────────
+  - type: web
+    name: contractos-web
+    runtime: static
+    region: frankfurt
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+
+    # SPA routing — all paths serve index.html
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+    envVars:
+      - key: VITE_API_URL
+        sync: false         # e.g. https://contractos-api.onrender.com/api

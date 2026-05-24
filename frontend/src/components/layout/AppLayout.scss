@@ -1,0 +1,250 @@
+@import '../../styles/global';
+
+.app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #0f172a 0%, #1a1f35 100%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+
+  // Decorative top accent line
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $color-primary, $color-secondary);
+  }
+
+  &__logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__logo-mark {
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, $color-primary, $color-secondary);
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba($color-primary,.4);
+  }
+
+  &__logo-text {
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+
+  &__logo-sub {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  &__nav {
+    flex: 1;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    overflow-y: auto;
+  }
+
+  &__section-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #475569;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 10px 4px;
+    margin-top: 8px;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: $radius-sm;
+    transition: background $transition, color $transition;
+    position: relative;
+
+    &:hover {
+      background: $sidebar-hover;
+      color: #f1f5f9;
+      text-decoration: none;
+    }
+
+    &--active {
+      background: $sidebar-active-bg;
+      color: #fff;
+      font-weight: 600;
+
+      // Right border for active (RTL: the "start" side)
+      &::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 20%;
+        height: 60%;
+        width: 3px;
+        background: $sidebar-active-border;
+        border-radius: 3px 0 0 3px;
+      }
+
+      .sidebar__link-icon { opacity: 1; }
+    }
+  }
+
+  &__link-icon {
+    font-size: 16px;
+    opacity: 0.65;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  &__footer {
+    padding: 14px 16px;
+    border-top: 1px solid rgba(255,255,255,.07);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $color-primary, $color-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  &__user-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__user {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+
+  &__user-role {
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  &__logout {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    border-radius: $radius-xs;
+    transition: color $transition, background $transition;
+    flex-shrink: 0;
+    line-height: 1;
+
+    &:hover { color: #f87171; background: rgba(248,113,113,.1); }
+  }
+}
+
+// ── App content ───────────────────────────────────────────────────────────────
+.app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: $color-bg;
+}
+
+// ── Topbar ───────────────────────────────────────────────────────────────────
+.topbar {
+  height: 60px;
+  background: $color-surface;
+  border-bottom: 1px solid $color-border;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 28px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  gap: 16px;
+
+  &__notif {
+    position: relative;
+    font-size: 20px;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-sm;
+    transition: background $transition;
+
+    &:hover { background: #f8fafc; }
+  }
+
+  &__badge {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background: $color-danger;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 99px;
+    min-width: 18px;
+    text-align: center;
+    border: 2px solid $color-surface;
+  }
+}
+
+// ── Main content ──────────────────────────────────────────────────────────────
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 32px;
+}
