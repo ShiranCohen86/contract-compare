@@ -5,15 +5,20 @@ const ClauseChange = require('../models/ClauseChange');
 const ApiError = require('../utils/ApiError');
 const { paginate } = require('../utils/pagination');
 
+function oid(val) {
+  // Works whether val is a populated Document, ObjectId, or plain string
+  return String(val?._id ?? val);
+}
+
 function assertParticipant(contract, userId) {
-  const isOwner = String(contract.ownerId) === userId;
-  const isParticipant = contract.participants.some((p) => String(p.userId) === userId);
+  const isOwner       = oid(contract.ownerId) === userId;
+  const isParticipant = contract.participants.some((p) => oid(p.userId) === userId);
   if (!isOwner && !isParticipant) throw ApiError.forbidden('Not a participant');
 }
 
 function getParticipantRole(contract, userId) {
-  if (String(contract.ownerId) === userId) return 'OWNER';
-  const p = contract.participants.find((p) => String(p.userId) === userId);
+  if (oid(contract.ownerId) === userId) return 'OWNER';
+  const p = contract.participants.find((p) => oid(p.userId) === userId);
   return p?.role ?? null;
 }
 
