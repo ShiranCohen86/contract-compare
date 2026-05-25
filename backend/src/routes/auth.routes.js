@@ -13,9 +13,19 @@ const authLimiter = rateLimit({
   message: { error: 'Too many attempts — please try again later' },
 });
 
+// Stricter limiter for login — only counts failed attempts (4xx/5xx)
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'יותר מדי נסיונות כניסה — נסה שוב בעוד 15 דקות' },
+});
+
 // Public
 router.post('/signup',          authLimiter, validate(authValidator.signup),        authController.signup);
-router.post('/login',           authLimiter, validate(authValidator.login),          authController.login);
+router.post('/login',           loginLimiter, validate(authValidator.login),         authController.login);
 router.post('/refresh',         authLimiter, validate(authValidator.refresh),        authController.refresh);
 router.post('/password/forgot', authLimiter, validate(authValidator.requestReset),   authController.requestPasswordReset);
 router.post('/password/reset',  authLimiter, validate(authValidator.resetPassword),  authController.resetPassword);

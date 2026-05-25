@@ -28,6 +28,7 @@ const NotificationSchema = new mongoose.Schema(
 
 NotificationSchema.statics.TYPES = NOTIF_TYPES;
 NotificationSchema.index({ userId: 1, isRead: 1 });
+NotificationSchema.index({ userId: 1, createdAt: -1 }); // notification feed sorted by time
 NotificationSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Notification', NotificationSchema);

@@ -25,5 +25,7 @@ ClauseChangeSchema.statics.TYPES    = CHANGE_TYPES;
 ClauseChangeSchema.statics.STATUSES = CHANGE_STATUSES;
 
 ClauseChangeSchema.index({ contractId: 1, status: 1 });
+ClauseChangeSchema.index({ clauseId: 1, status: 1 });       // find pending changes per clause
+ClauseChangeSchema.index({ proposedById: 1, createdAt: -1 }); // user's own changes history
 
 module.exports = mongoose.model('ClauseChange', ClauseChangeSchema);

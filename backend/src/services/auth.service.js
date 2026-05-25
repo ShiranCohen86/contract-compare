@@ -47,18 +47,20 @@ async function signup({ name, email, password, userAgent, ip }) {
   return { user: user.toJSON(), accessToken, refreshToken };
 }
 
+// Dummy hash — used when user not found to prevent email enumeration via timing
+const DUMMY_HASH = '$2a$10$abcdefghijklmnopqrstuuABCDEFGHIJKLMNOPQRSTUVWXYZ012345';
+
 // ── Login ─────────────────────────────────────────────────────────────────────
 
 async function login({ email, password, userAgent, ip }) {
   const user = await User.findOne({ email: email.toLowerCase() }).select('+passwordHash');
-  if (!user || !user.isActive) {
-    AuditLog.create({ action: 'auth.login.failed', ip, userAgent, meta: { email } }).catch(() => {});
-    throw ApiError.unauthorized('Invalid credentials');
-  }
 
-  const ok = await user.verifyPassword(password);
-  if (!ok) {
-    AuditLog.create({ userId: user._id, action: 'auth.login.failed', ip, userAgent, meta: { email } }).catch(() => {});
+  // Always run bcrypt to prevent timing-based email enumeration
+  const hashToCheck = (user?.isActive && user?.passwordHash) ? user.passwordHash : DUMMY_HASH;
+  const ok = await bcrypt.compare(password, hashToCheck);
+
+  if (!user || !user.isActive || !ok) {
+    AuditLog.create({ action: 'auth.login.failed', ip, userAgent, meta: { email } }).catch(() => {});
     throw ApiError.unauthorized('Invalid credentials');
   }
 

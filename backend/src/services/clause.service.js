@@ -1,3 +1,4 @@
+const xss = require('xss');
 const Contract = require('../models/Contract');
 const Clause = require('../models/Clause');
 const ClauseChange = require('../models/ClauseChange');
@@ -5,6 +6,9 @@ const ApiError = require('../utils/ApiError');
 const { assertParticipant, assertNotObserver } = require('./contract.service');
 const notificationService = require('./notification.service');
 const { emitToContract } = require('./socket.service');
+
+// Strip all HTML — clauses are plain text, never rendered as HTML in app
+const sanitize = (str) => (str ? xss(str, { whiteList: {}, stripIgnoreTag: true }) : str);
 
 async function setNegotiatingIfNeeded(contract) {
   if (contract.status === 'AWAITING_REVIEW') {
@@ -30,6 +34,8 @@ async function getNextPosition(contractId) {
 }
 
 async function create(contractId, userId, { title, content, position }) {
+  content = sanitize(content);
+  title   = sanitize(title);
   const contract = await Contract.findById(contractId);
   if (!contract) throw ApiError.notFound('Contract not found');
   assertParticipant(contract, userId);
@@ -87,6 +93,8 @@ async function create(contractId, userId, { title, content, position }) {
 }
 
 async function update(clauseId, userId, { title, content }) {
+  if (content !== undefined) content = sanitize(content);
+  if (title   !== undefined) title   = sanitize(title);
   const clause = await Clause.findById(clauseId);
   if (!clause) throw ApiError.notFound('Clause not found');
   if (!['ACTIVE'].includes(clause.status)) throw ApiError.badRequest('Cannot edit this clause in its current state');
