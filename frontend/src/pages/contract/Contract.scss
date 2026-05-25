@@ -140,6 +140,44 @@
   p  { margin-bottom: 14px; color: $color-muted; font-size: 14px; line-height: 1.6; }
 }
 
+// ── Invite link fallback box ──────────────────────────────────────────────────
+.invite-link-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: $radius-sm;
+  animation: fadeInUp 0.2s ease both;
+
+  &__label {
+    font-size: 12px;
+    color: #1e40af;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  &__row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 10px;
+    border: 1px solid #bfdbfe;
+    border-radius: $radius-xs;
+    font-size: 12px;
+    font-family: monospace;
+    background: #fff;
+    color: #1e3a8a;
+    outline: none;
+    cursor: text;
+  }
+}
+
 // ── Role select ───────────────────────────────────────────────────────────────
 .invite-role-select {
   padding: 10px 14px;

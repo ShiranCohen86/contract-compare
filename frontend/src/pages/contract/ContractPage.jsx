@@ -45,6 +45,7 @@ export default function ContractPage() {
   const [inviteEmail, setInviteEmail]   = useState('');
   const [inviteRole, setInviteRole]     = useState('COUNTERPARTY');
   const [inviting, setInviting]         = useState(false);
+  const [inviteUrl, setInviteUrl]       = useState(null);
   const [respondingId, setRespondingId] = useState(null);
   const [withdrawingId, setWithdrawingId] = useState(null);
   const [cancelling, setCancelling]     = useState(false);
@@ -172,8 +173,9 @@ export default function ContractPage() {
     e.preventDefault();
     setInviting(true);
     try {
-      await api.post(`/contracts/${id}/invites`, { email: inviteEmail, role: inviteRole });
+      const { data: inv } = await api.post(`/contracts/${id}/invites`, { email: inviteEmail, role: inviteRole });
       setInviteEmail('');
+      setInviteUrl(inv.inviteUrl || null);
       toast(`ההזמנה נשלחה ל-${inviteEmail} ✓`);
     } catch (err) {
       toast(err.response?.data?.error || 'שגיאה בשליחת ההזמנה', { type: 'error' });
@@ -312,6 +314,20 @@ export default function ContractPage() {
               {inviting ? t('loading') : t('sendInvite')}
             </button>
           </form>
+          {inviteUrl && (
+            <div className="invite-link-box">
+              <span className="invite-link-box__label">קישור הזמנה (אם המייל לא הגיע):</span>
+              <div className="invite-link-box__row">
+                <input readOnly value={inviteUrl} className="invite-link-box__input" onFocus={(e) => e.target.select()} />
+                <button
+                  className="btn btn--ghost btn--sm"
+                  onClick={() => { navigator.clipboard.writeText(inviteUrl); toast('הקישור הועתק ✓'); }}
+                >
+                  העתק
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
