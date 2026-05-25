@@ -5,11 +5,21 @@
   margin: 0 auto;
   animation: fadeInUp 0.3s ease both;
 
+  @media (max-width: 820px) {
+    max-width: 100%;
+  }
+
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 28px;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    @media (max-width: 480px) {
+      margin-bottom: 18px;
+    }
   }
 
   &__title {
@@ -17,6 +27,10 @@
     font-weight: 800;
     color: $color-text;
     letter-spacing: -0.02em;
+
+    @media (max-width: 480px) {
+      font-size: 21px;
+    }
   }
 
   &__new-form {
@@ -30,6 +44,7 @@
     &-actions {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
   }
 
@@ -93,10 +108,15 @@ $status-colors: (
   &:active { transform: translateY(0); }
 
   &__inner {
-    padding: 18px 20px 16px;
+    padding: 16px 18px 14px;
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: 14px;
+
+    @media (max-width: 480px) {
+      padding: 14px 14px 12px;
+      gap: 10px;
+    }
   }
 
   &__icon {
@@ -138,9 +158,14 @@ $status-colors: (
   &__meta {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
     font-size: 12px;
     color: $color-muted;
+    flex-wrap: wrap;
+
+    @media (max-width: 480px) {
+      gap: 6px;
+    }
   }
 
   &__meta-item {

@@ -1,4 +1,5 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { logout } from '../../store/slices/authSlice';
@@ -17,8 +18,24 @@ export default function AppLayout() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const user = useSelector((s) => s.auth.user);
   const unread = useSelector((s) => s.notifications.unread);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar on route change (mobile nav)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
+  // Close sidebar on wide screens
+  useEffect(() => {
+    function onResize() {
+      if (window.innerWidth > 768) setSidebarOpen(false);
+    }
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   async function handleLogout() {
     await dispatch(logout());
@@ -31,7 +48,16 @@ export default function AppLayout() {
 
   return (
     <div className="app-layout">
-      <aside className="sidebar">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside className={`sidebar${sidebarOpen ? ' sidebar--open' : ''}`}>
         {/* Logo */}
         <div className="sidebar__logo">
           <div className="sidebar__logo-mark">📋</div>
@@ -93,6 +119,15 @@ export default function AppLayout() {
       <div className="app-content">
         {/* Topbar */}
         <header className="topbar">
+          {/* Hamburger — mobile only */}
+          <button
+            className="topbar__hamburger"
+            onClick={() => setSidebarOpen((o) => !o)}
+            aria-label="פתח תפריט"
+          >
+            <span /><span /><span />
+          </button>
+
           <div className="topbar__notif">
             🔔
             {unread > 0 && (

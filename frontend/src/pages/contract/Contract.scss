@@ -15,6 +15,14 @@
   gap: 20px;
   animation: fadeInUp 0.3s ease both;
 
+  @media (max-width: 780px) {
+    max-width: 100%;
+  }
+
+  @media (max-width: 480px) {
+    gap: 14px;
+  }
+
   &__topbar {
     display: flex;
     align-items: center;
@@ -27,8 +35,14 @@
     font-size: 22px;
     font-weight: 800;
     flex: 1;
+    min-width: 0;
     color: $color-text;
     letter-spacing: -0.02em;
+    word-break: break-word;
+
+    @media (max-width: 480px) {
+      font-size: 18px;
+    }
   }
 }
 
@@ -83,7 +97,7 @@
 
     input {
       flex: 1;
-      min-width: 200px;
+      min-width: 160px;     // reduced from 200px to prevent overflow on small phones
       padding: 10px 14px;
       border: 1.5px solid $color-border;
       border-radius: $radius-sm;
@@ -91,6 +105,11 @@
       font-size: 14px;
       transition: border-color $transition, box-shadow $transition;
       outline: none;
+
+      @media (max-width: 480px) {
+        min-width: 0;
+        width: 100%;
+      }
 
       &:focus { border-color: $color-primary; box-shadow: 0 0 0 3px rgba($color-primary,.12); }
     }

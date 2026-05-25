@@ -286,7 +286,7 @@ export default function ContractPage() {
                 required autoFocus
               />
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <button type="submit" className="btn btn--primary btn--sm">{t('save')}</button>
               <button type="button" className="btn btn--ghost btn--sm" onClick={() => setAddingClause(false)}>{t('cancel')}</button>
             </div>
@@ -350,7 +350,7 @@ export default function ContractPage() {
       {['APPROVED', 'EXPORTED'].includes(contract.status) && (
         <div className="card contract-section">
           <h3>ייצוא</h3>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <button className="btn btn--primary" onClick={() => handleExport('pdf')}>⬇ {t('exportPdf')}</button>
             <button className="btn btn--ghost"   onClick={() => handleExport('docx')}>⬇ {t('exportDocx')}</button>
           </div>

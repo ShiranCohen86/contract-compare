@@ -6,6 +6,25 @@
   overflow: hidden;
 }
 
+// ── Mobile overlay ────────────────────────────────────────────────────────────
+.sidebar-overlay {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 99;
+    animation: fadeIn 0.2s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 .sidebar {
   width: 240px;
@@ -25,6 +44,23 @@
     left: 0;
     height: 3px;
     background: linear-gradient(90deg, $color-primary, $color-secondary);
+  }
+
+  // ── Mobile: slide off-screen, slide back in when open ──────────────────────
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 0;
+    right: 0;           // RTL: sidebar enters from right
+    height: 100%;
+    z-index: 100;
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+    box-shadow: none;
+
+    &--open {
+      transform: translateX(0);
+      box-shadow: -8px 0 32px rgba(0,0,0,.3);
+    }
   }
 
   &__logo {
@@ -87,7 +123,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 12px 14px;   // 12px vertical for better tap target on mobile
     color: #94a3b8;
     font-size: 14px;
     font-weight: 500;
@@ -107,7 +143,6 @@
       color: #fff;
       font-weight: 600;
 
-      // Right border for active (RTL: the "start" side)
       &::after {
         content: '';
         position: absolute;
@@ -124,9 +159,9 @@
   }
 
   &__link-icon {
-    font-size: 16px;
+    font-size: 18px;    // slightly larger for touch
     opacity: 0.65;
-    width: 20px;
+    width: 22px;
     text-align: center;
     flex-shrink: 0;
   }
@@ -178,12 +213,17 @@
     border: none;
     color: #64748b;
     cursor: pointer;
-    font-size: 18px;
-    padding: 4px;
+    font-size: 20px;    // bigger tap target
+    padding: 6px;
     border-radius: $radius-xs;
     transition: color $transition, background $transition;
     flex-shrink: 0;
     line-height: 1;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover { color: #f87171; background: rgba(248,113,113,.1); }
   }
@@ -196,27 +236,62 @@
   flex-direction: column;
   overflow: hidden;
   background: $color-bg;
+  min-width: 0;
 }
 
 // ── Topbar ───────────────────────────────────────────────────────────────────
 .topbar {
-  height: 60px;
+  height: 56px;
   background: $color-surface;
   border-bottom: 1px solid $color-border;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: 0 28px;
+  padding: 0 20px;
   flex-shrink: 0;
   box-shadow: 0 1px 3px rgba(0,0,0,.05);
-  gap: 16px;
+  gap: 12px;
+
+  @media (max-width: 768px) {
+    justify-content: space-between;  // hamburger on left (RTL: start), notif on right
+  }
+
+  &__hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: $radius-sm;
+    min-width: 40px;
+    min-height: 40px;
+    transition: background $transition;
+
+    span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: $color-text;
+      border-radius: 2px;
+      transition: background $transition;
+    }
+
+    &:hover { background: #f1f5f9; }
+
+    @media (max-width: 768px) {
+      display: flex;
+    }
+  }
 
   &__notif {
     position: relative;
     font-size: 20px;
     cursor: pointer;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -247,4 +322,18 @@
   flex: 1;
   overflow-y: auto;
   padding: 28px 32px;
+  // iOS Safari momentum scrolling
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 1024px) {
+    padding: 24px 24px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px 16px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 16px 12px;
+  }
 }

@@ -36,6 +36,10 @@ $transition: 0.18s cubic-bezier(.4,0,.2,1);
 html {
   font-size: 16px;
   direction: rtl;
+
+  @media (max-width: 480px) {
+    font-size: 15px;  // subtle scale-down so spacing proportions hold
+  }
 }
 
 body {
@@ -187,6 +191,11 @@ img { max-width: 100%; display: block; }
   padding: 22px 24px;
   box-shadow: $shadow-sm;
   transition: box-shadow $transition;
+
+  @media (max-width: 600px) {
+    padding: 16px 18px;
+    border-radius: $radius-sm;
+  }
 }
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
@@ -237,6 +246,21 @@ img { max-width: 100%; display: block; }
   font-weight: 800;
   color: $color-text;
   letter-spacing: -0.02em;
+
+  @media (max-width: 480px) {
+    font-size: 20px;
+  }
+}
+
+// ── Responsive flex helpers ───────────────────────────────────────────────────
+.flex-wrap-mobile {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
 }
 
 // ── Divider ───────────────────────────────────────────────────────────────────

@@ -6,6 +6,10 @@
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
 
+  @media (max-width: 900px) {
+    grid-template-columns: 45% 55%;  // give more space to form on tablets
+  }
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -22,6 +26,7 @@
   position: relative;
   overflow: hidden;
 
+  @media (max-width: 900px) { padding: 32px 24px; }
   @media (max-width: 768px) { display: none; }
 
   // Decorative circles
@@ -133,6 +138,16 @@
   padding: 36px 32px;
   box-shadow: $shadow-lg;
   animation: fadeInUp 0.35s ease both;
+
+  @media (max-width: 480px) {
+    padding: 28px 20px;
+    border-radius: $radius-md;
+    box-shadow: $shadow-sm;
+  }
+
+  @media (max-width: 360px) {
+    padding: 22px 16px;
+  }
 
   &__header {
     text-align: center;
