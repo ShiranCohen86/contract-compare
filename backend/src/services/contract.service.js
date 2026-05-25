@@ -6,8 +6,8 @@ const ApiError = require('../utils/ApiError');
 const { paginate } = require('../utils/pagination');
 
 function oid(val) {
-  // Works whether val is a populated Document, ObjectId, or plain string
-  return String(val?._id ?? val);
+  if (val == null) throw new Error('oid() received null/undefined — populate or ObjectId missing');
+  return String(val._id ?? val);
 }
 
 function assertParticipant(contract, userId) {

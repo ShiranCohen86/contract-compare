@@ -6,7 +6,7 @@ const env = {
   JWT_EXPIRES_IN:         process.env.JWT_EXPIRES_IN || '15m',
   JWT_REFRESH_SECRET:     process.env.JWT_REFRESH_SECRET || 'dev_refresh_secret_change_me_DIFFERENT',
   JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '30d',
-  BCRYPT_SALT_ROUNDS:     parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 10,
+  BCRYPT_SALT_ROUNDS:     Math.max(parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 10, 10),
   FRONTEND_URL:           process.env.FRONTEND_URL || 'http://localhost:5173',
   RATE_LIMIT_WINDOW_MS:   parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,
   RATE_LIMIT_MAX:         parseInt(process.env.RATE_LIMIT_MAX, 10) || 200,

@@ -1,10 +1,10 @@
 const asyncHandler = require('../utils/asyncHandler');
 const inviteService = require('../services/invite.service');
+const env = require('../config/env');
 
 exports.send = asyncHandler(async (req, res) => {
   const invite = await inviteService.send(req.params.contractId, req.user.id, req.body.email, req.body.role);
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-  res.status(201).json({ ...invite.toObject(), inviteUrl: `${frontendUrl}/invite/${invite.token}` });
+  res.status(201).json({ ...invite.toObject(), inviteUrl: `${env.FRONTEND_URL}/invite/${invite.token}` });
 });
 
 exports.getByToken = asyncHandler(async (req, res) => {

@@ -1,8 +1,11 @@
+const SAFE_SORT_RE = /^-?[a-zA-Z_]{1,40}$/;
+
 function parsePagination(query) {
   const page = Math.max(parseInt(query.page, 10) || 1, 1);
   const limit = Math.min(Math.max(parseInt(query.limit, 10) || 20, 1), 200);
   const skip = (page - 1) * limit;
-  const sort = query.sort || '-createdAt';
+  const rawSort = query.sort || '-createdAt';
+  const sort = SAFE_SORT_RE.test(rawSort) ? rawSort : '-createdAt';
   return { page, limit, skip, sort };
 }
 

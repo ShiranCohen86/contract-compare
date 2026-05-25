@@ -9,6 +9,8 @@ const { notifyUserWithEmail } = notificationService;
 const { emitToContract } = require('./socket.service');
 const { paginate } = require('../utils/pagination');
 
+const TERMINAL_STATUSES = ['CANCELLED', 'APPROVED', 'EXPORTED'];
+
 async function listByContract(contractId, userId, query) {
   const contract = await Contract.findById(contractId);
   if (!contract) throw ApiError.notFound('Contract not found');
@@ -31,6 +33,9 @@ async function approve(changeId, userId) {
   const contract = await Contract.findById(change.contractId);
   assertParticipant(contract, userId);
   assertNotObserver(contract, userId);
+
+  const TERMINAL = TERMINAL_STATUSES;
+  if (TERMINAL.includes(contract.status)) throw ApiError.badRequest('Cannot modify changes on a contract in this status');
 
   if (String(change.proposedById) === userId) throw ApiError.forbidden('Cannot approve your own change');
 
@@ -68,6 +73,8 @@ async function reject(changeId, userId, reason) {
   assertParticipant(contract, userId);
   assertNotObserver(contract, userId);
 
+  if (TERMINAL.includes(contract.status)) throw ApiError.badRequest('Cannot modify changes on a contract in this status');
+
   if (String(change.proposedById) === userId) throw ApiError.forbidden('Cannot reject your own change');
 
   change.status = 'REJECTED';
@@ -89,6 +96,9 @@ async function reject(changeId, userId, reason) {
     metadata: { changeId: String(change._id), reason },
   });
 
+  // Rejection might resolve all pending changes → check for final approval readiness
+  await checkReadyForFinal(contract);
+
   return change;
 }
 
@@ -104,6 +114,9 @@ async function withdraw(changeId, userId) {
   await revertPendingState(change);
 
   emitToContract(String(change.contractId), 'contract:updated', { type: 'change_withdrawn', changeId: String(change._id) });
+
+  // Withdrawal might resolve all pending changes → check for final approval readiness
+  await checkReadyForFinal(change.contractId);
 
   return change;
 }

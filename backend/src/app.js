@@ -38,16 +38,6 @@ app.use('/api', rateLimit({
   legacyHeaders:   false,
 }));
 
-// Stricter rate limit for auth endpoints
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders:   false,
-  message: { error: 'Too many attempts. Please try again in 15 minutes.' },
-});
-app.use('/api/auth/login',  authLimiter);
-app.use('/api/auth/signup', authLimiter);
 
 app.get('/health', (_req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 

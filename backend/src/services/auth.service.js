@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const env = require('../config/env');
 const User = require('../models/User');
@@ -137,7 +138,11 @@ async function requestPasswordReset(email) {
   user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000);
   await user.save();
 
-  return { ok: true, devToken: env.NODE_ENV !== 'production' ? rawToken : undefined };
+  if (env.NODE_ENV !== 'production') {
+    const logger = require('../utils/logger');
+    logger.debug('Password reset token (dev only — never in production)', { email: user.email, rawToken });
+  }
+  return { ok: true };
 }
 
 async function resetPassword({ token, newPassword }) {

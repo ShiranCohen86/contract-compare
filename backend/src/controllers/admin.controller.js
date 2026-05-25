@@ -39,8 +39,9 @@ exports.makeAdmin = asyncHandler(async (req, res) => {
 
 // GET /admin/contracts
 exports.listContracts = asyncHandler(async (req, res) => {
+  const VALID_STATUSES = ['DRAFT', 'AWAITING_REVIEW', 'NEGOTIATING', 'PENDING_FINAL', 'APPROVED', 'EXPORTED', 'CANCELLED'];
   const filter = {};
-  if (req.query.status) filter.status = req.query.status;
+  if (req.query.status && VALID_STATUSES.includes(req.query.status)) filter.status = req.query.status;
   const result = await paginate(Contract, filter, req.query, {
     populate: [{ path: 'ownerId', select: 'name email' }],
   });

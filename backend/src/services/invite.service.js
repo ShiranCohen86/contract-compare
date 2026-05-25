@@ -71,8 +71,19 @@ async function accept(token, userId) {
   if (invite.status !== 'PENDING') throw ApiError.badRequest('Invite is no longer valid');
   if (invite.expiresAt < new Date()) throw ApiError.badRequest('Invite has expired');
 
+  // Verify the accepting user's email matches the invite recipient
+  const acceptingUser = await User.findById(userId).select('email').lean();
+  if (!acceptingUser || acceptingUser.email.toLowerCase() !== invite.email.toLowerCase()) {
+    throw ApiError.forbidden('הזמנה זו נשלחה לכתובת מייל אחרת');
+  }
+
   const contract = await Contract.findById(invite.contractId);
   if (!contract) throw ApiError.notFound('Contract not found');
+
+  // Prevent joining a contract that is no longer open
+  if (['CANCELLED', 'APPROVED', 'EXPORTED'].includes(contract.status)) {
+    throw ApiError.badRequest('חוזה זה אינו פתוח להצטרפות');
+  }
 
   const alreadyIn = contract.participants.some((p) => String(p.userId) === userId);
   if (!alreadyIn) {

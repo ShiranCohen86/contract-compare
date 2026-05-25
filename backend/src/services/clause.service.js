@@ -16,6 +16,8 @@ const SAFE_TAGS = {
 };
 const sanitize = (str) => (str ? xss(str, { whiteList: SAFE_TAGS, stripIgnoreTag: true, stripIgnoreTagBody: ['script', 'style'] }) : str);
 
+const TERMINAL_STATUSES = ['CANCELLED', 'APPROVED', 'EXPORTED'];
+
 async function setNegotiatingIfNeeded(contract) {
   if (contract.status === 'AWAITING_REVIEW') {
     contract.status = 'NEGOTIATING';
@@ -46,6 +48,8 @@ async function create(contractId, userId, { title, content, position }) {
   if (!contract) throw ApiError.notFound('Contract not found');
   assertParticipant(contract, userId);
   assertNotObserver(contract, userId);
+
+  if (TERMINAL_STATUSES.includes(contract.status)) throw ApiError.badRequest('Cannot add clauses to a contract in this status');
 
   const isOwner = String(contract.ownerId) === userId;
   const settings = contract.settings || Contract.DEFAULT_SETTINGS;
@@ -109,6 +113,8 @@ async function update(clauseId, userId, { title, content }) {
   const contract = await Contract.findById(clause.contractId);
   assertParticipant(contract, userId);
   assertNotObserver(contract, userId);
+
+  if (TERMINAL_STATUSES.includes(contract.status)) throw ApiError.badRequest('Cannot edit clauses on a contract in this status');
 
   const settings = contract.settings || Contract.DEFAULT_SETTINGS;
 
@@ -178,6 +184,8 @@ async function remove(clauseId, userId) {
   assertParticipant(contract, userId);
   assertNotObserver(contract, userId);
 
+  if (TERMINAL_STATUSES.includes(contract.status)) throw ApiError.badRequest('Cannot delete clauses on a contract in this status');
+
   const settings = contract.settings || Contract.DEFAULT_SETTINGS;
   const isOwner = String(contract.ownerId) === userId;
   const requiresApproval = settings.deleteRequiresApproval !== false || !isOwner || contract.status !== 'DRAFT';
@@ -227,6 +235,7 @@ async function reorder(contractId, userId, orderedIds) {
   const contract = await Contract.findById(contractId);
   if (!contract) throw ApiError.notFound('Contract not found');
   assertParticipant(contract, userId);
+  assertNotObserver(contract, userId);
 
   const updates = orderedIds.map((id, index) =>
     Clause.updateOne({ _id: id, contractId }, { $set: { position: index + 1 } }),

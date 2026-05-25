@@ -4,6 +4,7 @@ const User = require('../models/User');
 const { paginate } = require('../utils/pagination');
 const { emitToUser } = require('./socket.service');
 const emailService = require('./email.service');
+const logger = require('../utils/logger');
 
 async function create({ contractId, userId, type, title, body, actionUrl, metadata }) {
   const notif = await Notification.create({ contractId, userId, type, title, body, actionUrl, metadata });
@@ -30,7 +31,7 @@ async function notifyOtherParticipants(contract, senderId, { type, title, body, 
     ),
   );
 
-  // Fire-and-forget emails
+  // Fire-and-forget emails (log failures, don't swallow silently)
   if (type === 'CLAUSE_ADDED' || type === 'CHANGE_PROPOSED') {
     User.find({ _id: { $in: otherIds } }).select('email').lean().then((users) => {
       users.forEach((u) => {
@@ -39,9 +40,9 @@ async function notifyOtherParticipants(contract, senderId, { type, title, body, 
           contractTitle: contract.title,
           contractId:    String(contract._id),
           changeType:    changeType || type,
-        }).catch(() => {});
+        }).catch((err) => logger.error('sendChangeProposed failed', { to: u.email, err: err.message }));
       });
-    }).catch(() => {});
+    }).catch((err) => logger.error('notifyOtherParticipants email lookup failed', { err: err.message }));
   }
 }
 
@@ -57,14 +58,16 @@ async function notifyUserWithEmail(userId, contract, { type, title, body, change
 
   User.findById(userId).select('email').lean().then((u) => {
     if (!u?.email) return;
+    const emailArgs = { contractTitle: contract.title, contractId: String(contract._id) };
+    const onFail = (err) => logger.error('notifyUserWithEmail send failed', { type, to: u.email, err: err.message });
     if (type === 'CHANGE_APPROVED') {
-      emailService.sendChangeApproved({ to: u.email, contractTitle: contract.title, contractId: String(contract._id) }).catch(() => {});
+      emailService.sendChangeApproved({ to: u.email, ...emailArgs }).catch(onFail);
     } else if (type === 'CHANGE_REJECTED') {
-      emailService.sendChangeRejected({ to: u.email, contractTitle: contract.title, contractId: String(contract._id), reason }).catch(() => {});
+      emailService.sendChangeRejected({ to: u.email, ...emailArgs, reason }).catch(onFail);
     } else if (type === 'FINAL_APPROVAL_READY') {
-      emailService.sendFinalApprovalReady({ to: u.email, contractTitle: contract.title, contractId: String(contract._id) }).catch(() => {});
+      emailService.sendFinalApprovalReady({ to: u.email, ...emailArgs }).catch(onFail);
     }
-  }).catch(() => {});
+  }).catch((err) => logger.error('notifyUserWithEmail user lookup failed', { userId, err: err.message }));
 }
 
 async function listForUser(userId, query) {
