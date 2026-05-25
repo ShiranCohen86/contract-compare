@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import api from '../../lib/api';
 import { getSocket } from '../../lib/socket';
 import { toast } from '../../lib/toaster';
+import InlineDiff from '../../components/ui/InlineDiff';
 import './Contract.scss';
 
 const STATUS_HE = {
@@ -347,8 +348,16 @@ export default function ContractPage() {
                   </span>
                   <span className="change-item__by">הוצע ע"י {ch.proposedById?.name || '—'}</span>
                 </div>
-                {ch.previousContent && <p className="diff-before">{ch.previousContent}</p>}
-                {ch.newContent      && <p className="diff-after">{ch.newContent}</p>}
+                {ch.changeType === 'EDIT' ? (
+                  <div className="diff-inline-block">
+                    <InlineDiff before={ch.previousContent} after={ch.newContent} />
+                  </div>
+                ) : (
+                  <>
+                    {ch.previousContent && <p className="diff-before">{ch.previousContent}</p>}
+                    {ch.newContent      && <p className="diff-after">{ch.newContent}</p>}
+                  </>
+                )}
 
                 <div className="change-item__actions">
                   {!isMine && !isObserver && (

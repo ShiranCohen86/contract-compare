@@ -288,7 +288,41 @@
 .change-edit   { border-right-color: $color-warning; background: #fffbeb; }
 .change-delete { border-right-color: $color-danger;  background: #fff5f5; }
 
-// Diff display
+// ── Inline diff (Word-style track changes) ────────────────────────────────────
+.diff-inline-block {
+  background: #fafafa;
+  border: 1px solid $color-border;
+  border-radius: $radius-xs;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+}
+
+.diff-inline {
+  &__added {
+    color: #15803d;
+    background: #dcfce7;
+    font-weight: 600;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  &__removed {
+    color: $color-danger;
+    background: #fee2e2;
+    text-decoration: line-through;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  // standalone (ADD/DELETE without before+after)
+  &--added  { color: #15803d; font-weight: 600; }
+  &--removed { color: $color-danger; text-decoration: line-through; }
+}
+
+// ── Legacy diff display (ADD / DELETE full blocks) ────────────────────────────
 .diff-before {
   color: $color-danger;
   text-decoration: line-through;
