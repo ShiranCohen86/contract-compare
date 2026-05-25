@@ -18,6 +18,15 @@ function RequireAuth({ children }) {
   return user ? children : <Navigate to="/login" replace />;
 }
 
+function RequireAdmin({ children }) {
+  const user = useSelector((s) => s.auth.user);
+  const status = useSelector((s) => s.auth.status);
+  if (status === 'loading') return null;
+  if (!user) return <Navigate to="/login" replace />;
+  if (!user.isAdmin) return <Navigate to="/dashboard" replace />;
+  return children;
+}
+
 export default function App() {
   const dispatch = useDispatch();
 
@@ -39,7 +48,7 @@ export default function App() {
           <Route path="/dashboard"     element={<DashboardPage />} />
           <Route path="/contracts/:id" element={<ContractPage />} />
           <Route path="/profile"       element={<ProfilePage />} />
-          <Route path="/admin"         element={<AdminPage />} />
+          <Route path="/admin"         element={<RequireAdmin><AdminPage /></RequireAdmin>} />
         </Route>
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
