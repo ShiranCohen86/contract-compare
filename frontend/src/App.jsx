@@ -1,16 +1,25 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMe } from './store/slices/authSlice';
 import AppLayout from './components/layout/AppLayout';
-import LoginPage from './pages/auth/LoginPage';
-import SignupPage from './pages/auth/SignupPage';
-import DashboardPage from './pages/dashboard/DashboardPage';
-import ContractPage from './pages/contract/ContractPage';
-import ExportPage from './pages/export/ExportPage';
-import InvitePage from './pages/invite/InvitePage';
-import ProfilePage from './pages/profile/ProfilePage';
-import AdminPage from './pages/admin/AdminPage';
+
+const LoginPage    = lazy(() => import('./pages/auth/LoginPage'));
+const SignupPage   = lazy(() => import('./pages/auth/SignupPage'));
+const DashboardPage = lazy(() => import('./pages/dashboard/DashboardPage'));
+const ContractPage  = lazy(() => import('./pages/contract/ContractPage'));
+const ExportPage    = lazy(() => import('./pages/export/ExportPage'));
+const InvitePage    = lazy(() => import('./pages/invite/InvitePage'));
+const ProfilePage   = lazy(() => import('./pages/profile/ProfilePage'));
+const AdminPage     = lazy(() => import('./pages/admin/AdminPage'));
+
+function PageLoader() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#64748b', fontSize: 14 }}>
+      טוען...
+    </div>
+  );
+}
 
 function RequireAuth({ children }) {
   const user = useSelector((s) => s.auth.user);
@@ -39,6 +48,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/login"         element={<LoginPage />} />
         <Route path="/signup"        element={<SignupPage />} />
@@ -55,6 +65,7 @@ export default function App() {
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

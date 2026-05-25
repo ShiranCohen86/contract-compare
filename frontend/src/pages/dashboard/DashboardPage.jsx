@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../../lib/api';
+import { SkeletonContractList } from '../../components/ui/Skeleton';
 import './Dashboard.scss';
 
 const STATUS_LABEL = {
@@ -28,11 +29,21 @@ export default function DashboardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [contracts, setContracts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]     = useState(true);
   const [loadError, setLoadError] = useState(null);
-  const [showNew, setShowNew] = useState(false);
-  const [newForm, setNewForm] = useState({ title: '', description: '' });
-  const [creating, setCreating] = useState(false);
+  const [showNew, setShowNew]     = useState(false);
+  const [newForm, setNewForm]     = useState({ title: '', description: '' });
+  const [creating, setCreating]   = useState(false);
+  const [search, setSearch]       = useState('');
+  const [filterStatus, setFilterStatus] = useState('ALL');
+
+  const filtered = useMemo(() => {
+    return contracts.filter((c) => {
+      const matchStatus = filterStatus === 'ALL' || c.status === filterStatus;
+      const matchSearch = !search || c.title.toLowerCase().includes(search.toLowerCase());
+      return matchStatus && matchSearch;
+    });
+  }, [contracts, search, filterStatus]);
 
   useEffect(() => {
     api.get('/contracts')
@@ -97,8 +108,31 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Search + Filter bar */}
+      {!loading && !loadError && contracts.length > 0 && (
+        <div className="dashboard__filters">
+          <input
+            className="dashboard__search"
+            type="text"
+            placeholder="חיפוש לפי שם חוזה..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <select
+            className="dashboard__filter-select"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="ALL">כל הסטטוסים</option>
+            {Object.entries(STATUS_LABEL).map(([k, v]) => (
+              <option key={k} value={k}>{v}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {loading ? (
-        <div className="dashboard__loading">⏳ טוען חוזים...</div>
+        <SkeletonContractList count={3} />
       ) : loadError ? (
         <p className="form-error" style={{ padding: '16px 0' }}>⚠ {loadError}</p>
       ) : contracts.length === 0 ? (
@@ -109,9 +143,17 @@ export default function DashboardPage() {
             ✚ {t('newContract')}
           </button>
         </div>
+      ) : filtered.length === 0 ? (
+        <div className="dashboard__empty">
+          <div className="dashboard__empty-icon">🔍</div>
+          <p>לא נמצאו חוזים התואמים לחיפוש</p>
+          <button className="btn btn--ghost btn--sm" onClick={() => { setSearch(''); setFilterStatus('ALL'); }}>
+            נקה סינון
+          </button>
+        </div>
       ) : (
         <div className="dashboard__list">
-          {contracts.map((c) => (
+          {filtered.map((c) => (
             <Link
               to={`/contracts/${c._id}`}
               key={c._id}

@@ -7,6 +7,7 @@ import { getSocket } from '../../lib/socket';
 import { toast } from '../../lib/toaster';
 import InlineDiff from '../../components/ui/InlineDiff';
 import RichEditor from '../../components/ui/RichEditor';
+import { SkeletonClauseList, SkeletonCard } from '../../components/ui/Skeleton';
 import './Contract.scss';
 
 const STATUS_HE = {
@@ -245,7 +246,15 @@ export default function ContractPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────────
 
-  if (loading) return <p className="contract-loading">{t('loading')}</p>;
+  if (loading) return (
+    <div className="contract-page">
+      <div className="contract-page__topbar">
+        <SkeletonCard rows={0} />
+      </div>
+      <SkeletonCard rows={2} />
+      <SkeletonClauseList count={3} />
+    </div>
+  );
   if (!data)   return <p className="contract-loading">לא נמצא</p>;
 
   const { contract, clauses, pendingChanges } = data;
