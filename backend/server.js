@@ -60,16 +60,37 @@ async function bootstrap() {
     socket.on('contract:join', ({ contractId }) => {
       if (!contractId) return;
       socket.join(`contract:${contractId}`);
+      socket.contractId = contractId; // remember for presence on disconnect
+      // Broadcast updated online list to everyone in this contract room
+      const room = io.sockets.adapter.rooms.get(`contract:${contractId}`);
+      const onlineUserIds = room
+        ? [...room].map((sid) => io.sockets.sockets.get(sid)?.userId).filter(Boolean)
+        : [];
+      io.to(`contract:${contractId}`).emit('presence:update', { contractId, onlineUserIds });
       logger.debug('Socket joined contract room', { contractId, userId: socket.userId });
     });
 
     socket.on('contract:leave', ({ contractId }) => {
       if (!contractId) return;
       socket.leave(`contract:${contractId}`);
+      socket.contractId = null;
+      const room = io.sockets.adapter.rooms.get(`contract:${contractId}`);
+      const onlineUserIds = room
+        ? [...room].map((sid) => io.sockets.sockets.get(sid)?.userId).filter(Boolean)
+        : [];
+      io.to(`contract:${contractId}`).emit('presence:update', { contractId, onlineUserIds });
     });
 
     socket.on('disconnect', () => {
       logger.debug('Socket disconnected', { id: socket.id });
+      // Notify contract room if this user was in one
+      if (socket.contractId) {
+        const room = io.sockets.adapter.rooms.get(`contract:${socket.contractId}`);
+        const onlineUserIds = room
+          ? [...room].map((sid) => io.sockets.sockets.get(sid)?.userId).filter(Boolean)
+          : [];
+        io.to(`contract:${socket.contractId}`).emit('presence:update', { contractId: socket.contractId, onlineUserIds });
+      }
     });
   });
 

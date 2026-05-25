@@ -86,11 +86,12 @@ async function create(contractId, userId, { title, content, position }) {
   if (!directAdd) {
     await setNegotiatingIfNeeded(contract);
     await notificationService.notifyOtherParticipants(contract, userId, {
-      type:   'CLAUSE_ADDED',
-      title:  'סעיף חדש ממתין לאישורך',
-      body:   title ? `"${title}"` : undefined,
-      changeId: String(change._id),
-      clauseId: String(clause._id),
+      type:       'CLAUSE_ADDED',
+      title:      'סעיף חדש ממתין לאישורך',
+      body:       title ? `"${title}"` : undefined,
+      changeType: 'ADD',
+      changeId:   String(change._id),
+      clauseId:   String(clause._id),
     });
   }
 
@@ -156,11 +157,12 @@ async function update(clauseId, userId, { title, content }) {
 
   await setNegotiatingIfNeeded(contract);
   await notificationService.notifyOtherParticipants(contract, userId, {
-    type:   'CHANGE_PROPOSED',
-    title:  'הוצעה עריכה לסעיף',
-    body:   clause.title || undefined,
-    changeId: String(change._id),
-    clauseId: String(clause._id),
+    type:       'CHANGE_PROPOSED',
+    title:      'הוצעה עריכה לסעיף',
+    body:       clause.title || undefined,
+    changeType: 'EDIT',
+    changeId:   String(change._id),
+    clauseId:   String(clause._id),
   });
 
   emitToContract(String(clause.contractId), 'contract:updated', { type: 'clause_edit_proposed', clauseId: String(clause._id) });
@@ -209,11 +211,12 @@ async function remove(clauseId, userId) {
 
   await setNegotiatingIfNeeded(contract);
   await notificationService.notifyOtherParticipants(contract, userId, {
-    type:   'CHANGE_PROPOSED',
-    title:  'בקשת מחיקת סעיף',
-    body:   clause.title || undefined,
-    changeId: String(change._id),
-    clauseId: String(clause._id),
+    type:       'CHANGE_PROPOSED',
+    title:      'בקשת מחיקת סעיף',
+    body:       clause.title || undefined,
+    changeType: 'DELETE',
+    changeId:   String(change._id),
+    clauseId:   String(clause._id),
   });
 
   emitToContract(String(clause.contractId), 'contract:updated', { type: 'clause_delete_proposed', clauseId: String(clause._id) });

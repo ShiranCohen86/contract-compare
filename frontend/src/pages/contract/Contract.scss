@@ -520,3 +520,31 @@
     text-overflow: ellipsis;
   }
 }
+
+// ── Presence indicator ─────────────────────────────────────────────────────────
+.presence-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &--online  {
+    background: #22c55e;
+    box-shadow: 0 0 0 2px rgba(#22c55e, .25);
+  }
+  &--offline { background: #cbd5e1; }
+}
+
+.presence-summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #15803d;
+  font-weight: 600;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 3px 10px;
+  border-radius: 99px;
+}

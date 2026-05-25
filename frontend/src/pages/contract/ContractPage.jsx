@@ -40,6 +40,7 @@ export default function ContractPage() {
 
   const [data, setData]                 = useState(null);
   const [loading, setLoading]           = useState(true);
+  const [onlineUsers, setOnlineUsers]   = useState([]);
   const [addingClause, setAddingClause] = useState(false);
   const [clauseForm, setClauseForm]     = useState({ title: '', content: '' });
   const [editingId, setEditingId]       = useState(null);   // clauseId being edited
@@ -76,11 +77,15 @@ export default function ContractPage() {
     socket.emit('contract:join', { contractId: id });
 
     function onUpdated() { load(); }
+    function onPresence({ onlineUserIds }) { setOnlineUsers(onlineUserIds || []); }
+
     socket.on('contract:updated', onUpdated);
+    socket.on('presence:update', onPresence);
 
     return () => {
       socket.emit('contract:leave', { contractId: id });
       socket.off('contract:updated', onUpdated);
+      socket.off('presence:update', onPresence);
     };
   }, [id, load]);
 
@@ -286,6 +291,11 @@ export default function ContractPage() {
         <h2 className="contract-page__title">{contract.title}</h2>
         <span className={`badge badge--${STATUS_BADGE[contract.status] || 'gray'}`}>{STATUS_HE[contract.status]}</span>
         {isObserver && <span className="badge badge--gray">צופה בלבד</span>}
+        {onlineUsers.length > 0 && (
+          <span className="presence-summary" title={`${onlineUsers.length} מחובר/ים`}>
+            <span className="presence-dot presence-dot--online" /> {onlineUsers.length} מחובר
+          </span>
+        )}
       </div>
 
       {/* Banners */}
@@ -552,12 +562,16 @@ export default function ContractPage() {
           <div className="participants-list">
             {contract.participants.map((p) => {
               const u        = p.userId;
+              const uid      = String(u?._id || u);
               const roleName = p.role === 'OWNER' ? 'יוצר' : p.role === 'OBSERVER' ? 'צופה' : 'צד שני';
+              const isOnline = onlineUsers.includes(uid);
               return (
-                <div key={String(u?._id || u)} className="participant-item">
+                <div key={uid} className="participant-item">
                   <div className="participant-item__avatar">{(u?.name || '?')[0]}</div>
                   <span className="participant-item__name">{u?.name || '—'}</span>
                   <span className="badge badge--gray">{roleName}</span>
+                  <span className={`presence-dot ${isOnline ? 'presence-dot--online' : 'presence-dot--offline'}`}
+                    title={isOnline ? 'מחובר' : 'לא מחובר'} />
                 </div>
               );
             })}

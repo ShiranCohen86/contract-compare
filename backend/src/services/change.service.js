@@ -5,6 +5,7 @@ const FinalApproval = require('../models/FinalApproval');
 const ApiError = require('../utils/ApiError');
 const { assertParticipant, assertNotObserver } = require('./contract.service');
 const notificationService = require('./notification.service');
+const { notifyUserWithEmail } = notificationService;
 const { emitToContract } = require('./socket.service');
 const { paginate } = require('../utils/pagination');
 
@@ -44,14 +45,12 @@ async function approve(changeId, userId) {
   // Broadcast to everyone in the contract room so all clients refresh
   emitToContract(String(change.contractId), 'contract:updated', { type: 'change_approved', changeId: String(change._id) });
 
-  // Notify proposer
-  await notificationService.create({
-    contractId: change.contractId,
-    userId:     change.proposedById,
-    type:       'CHANGE_APPROVED',
-    title:      'השינוי שלך אושר',
-    body:       change.clauseId?.title || undefined,
-    metadata:   { changeId: String(change._id) },
+  // Notify proposer (in-app + email)
+  await notifyUserWithEmail(change.proposedById, contract, {
+    type:     'CHANGE_APPROVED',
+    title:    'השינוי שלך אושר',
+    body:     change.clauseId?.title || undefined,
+    metadata: { changeId: String(change._id) },
   });
 
   // Check if all changes approved → ready for final approval
@@ -82,13 +81,12 @@ async function reject(changeId, userId, reason) {
 
   emitToContract(String(change.contractId), 'contract:updated', { type: 'change_rejected', changeId: String(change._id) });
 
-  // Notify proposer
-  await notificationService.create({
-    contractId: change.contractId,
-    userId:     change.proposedById,
-    type:       'CHANGE_REJECTED',
-    title:      'השינוי שלך נדחה',
-    metadata:   { changeId: String(change._id), reason },
+  // Notify proposer (in-app + email)
+  await notifyUserWithEmail(change.proposedById, contract, {
+    type:   'CHANGE_REJECTED',
+    title:  'השינוי שלך נדחה',
+    reason,
+    metadata: { changeId: String(change._id), reason },
   });
 
   return change;
@@ -148,16 +146,14 @@ async function checkReadyForFinal(contractOrId) {
   contract.status = 'PENDING_FINAL';
   await contract.save();
 
-  // Notify all participants
+  // Notify all participants (in-app + email)
   const userIds = contract.participants.map((p) => p.userId);
   await Promise.all(
     userIds.map((uid) =>
-      notificationService.create({
-        contractId: contract._id,
-        userId:     uid,
-        type:       'FINAL_APPROVAL_READY',
-        title:      'החוזה מוכן לאישור סופי',
-        body:       'כל השינויים אושרו — ניתן לתת אישור סופי',
+      notifyUserWithEmail(uid, contract, {
+        type:  'FINAL_APPROVAL_READY',
+        title: 'החוזה מוכן לאישור סופי',
+        body:  'כל השינויים אושרו — ניתן לתת אישור סופי',
       }),
     ),
   );
