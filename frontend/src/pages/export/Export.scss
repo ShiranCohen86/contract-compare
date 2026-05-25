@@ -1,0 +1,112 @@
+@import '../../styles/global';
+
+.export-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeInUp 0.3s ease both;
+
+  &__topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: 20px;
+    font-weight: 800;
+    color: $color-text;
+  }
+}
+
+.export-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: start;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.export-settings {
+  &__heading {
+    font-size: 15px;
+    font-weight: 700;
+    color: $color-text;
+    margin-bottom: 18px;
+  }
+
+  &__select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid $color-border;
+    border-radius: $radius-sm;
+    font-family: 'Heebo', sans-serif;
+    font-size: 14px;
+    background: $color-surface;
+    outline: none;
+    cursor: pointer;
+    &:focus { border-color: $color-primary; }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+  }
+}
+
+.export-preview {
+  &__heading {
+    font-size: 15px;
+    font-weight: 700;
+    color: $color-text;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid $color-border;
+  }
+
+  &__doc {
+    direction: rtl;
+    line-height: 1.8;
+    color: #111;
+    min-height: 400px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 8px 4px;
+  }
+
+  &__doc-title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    color: $color-text;
+  }
+
+  &__clause {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed #e2e8f0;
+
+    &:last-child { border-bottom: none; }
+
+    strong { display: block; margin-bottom: 6px; font-size: 14px; }
+
+    div { font-size: 13px; color: #334155; line-height: 1.7; }
+    p { margin: 0 0 4px; }
+    ul, ol { padding-right: 16px; margin: 4px 0; }
+  }
+
+  &__empty {
+    color: $color-muted;
+    font-size: 13px;
+    text-align: center;
+    padding: 40px 0;
+  }
+}

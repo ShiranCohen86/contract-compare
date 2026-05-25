@@ -571,10 +571,10 @@ export default function ContractPage() {
       {['APPROVED', 'EXPORTED'].includes(contract.status) && (
         <div className="card contract-section">
           <h3>⬇ ייצוא</h3>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <button className="btn btn--primary" onClick={() => handleExport('pdf')}>⬇ {t('exportPdf')}</button>
-            <button className="btn btn--ghost"   onClick={() => handleExport('docx')}>⬇ {t('exportDocx')}</button>
-          </div>
+          <p>החוזה אושר — ניתן לייצא ל-PDF או DOCX.</p>
+          <button className="btn btn--primary" onClick={() => navigate(`/contracts/${id}/export`)}>
+            ⬇ עמוד ייצוא ועיצוב
+          </button>
         </div>
       )}
 

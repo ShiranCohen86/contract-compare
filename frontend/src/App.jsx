@@ -7,6 +7,7 @@ import LoginPage from './pages/auth/LoginPage';
 import SignupPage from './pages/auth/SignupPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import ContractPage from './pages/contract/ContractPage';
+import ExportPage from './pages/export/ExportPage';
 import InvitePage from './pages/invite/InvitePage';
 import ProfilePage from './pages/profile/ProfilePage';
 import AdminPage from './pages/admin/AdminPage';
@@ -46,7 +47,8 @@ export default function App() {
         <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
           <Route index                 element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard"     element={<DashboardPage />} />
-          <Route path="/contracts/:id" element={<ContractPage />} />
+          <Route path="/contracts/:id"        element={<ContractPage />} />
+          <Route path="/contracts/:id/export" element={<ExportPage />} />
           <Route path="/profile"       element={<ProfilePage />} />
           <Route path="/admin"         element={<RequireAdmin><AdminPage /></RequireAdmin>} />
         </Route>

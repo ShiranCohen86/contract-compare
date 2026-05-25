@@ -87,7 +87,7 @@ async function generateDocx(contractId, userId, design = {}) {
           new TextRun({ text: `${clause.position}. ${clause.title || ''}`, bold: true }),
         ],
       }),
-      new Paragraph({ text: clause.content }),
+      new Paragraph({ text: stripHtml(clause.content) }),
       new Paragraph({ text: '' }),
     ]),
   ];
@@ -102,9 +102,13 @@ async function generateDocx(contractId, userId, design = {}) {
   return { buffer, filename: `${sanitizeFilename(contract.title)}.docx` };
 }
 
+function stripHtml(html) {
+  return String(html ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function buildHtml(contract, clauses, design) {
-  const title = escapeHtml(design.title || contract.title);
-  const font  = escapeHtml(design.font || 'Arial');
+  const title    = escapeHtml(design.title || contract.title);
+  const font     = escapeHtml(design.font || 'Arial');
   const fontSize = parseInt(design.fontSize, 10) || 12;
 
   return `<!DOCTYPE html>
@@ -112,18 +116,23 @@ function buildHtml(contract, clauses, design) {
 <head>
 <meta charset="UTF-8">
 <style>
-  body { font-family: '${font}', sans-serif; font-size: ${fontSize}pt; color: #111; }
-  h1   { text-align: center; margin-bottom: 2em; }
-  .clause { margin-bottom: 1.5em; }
-  .clause-title { font-weight: bold; }
+  body { font-family: '${font}', sans-serif; font-size: ${fontSize}pt; color: #111; direction: rtl; }
+  h1   { text-align: center; margin-bottom: 2em; font-size: ${fontSize + 6}pt; }
+  .clause { margin-bottom: 1.8em; page-break-inside: avoid; }
+  .clause-num { font-weight: bold; margin-bottom: .3em; }
+  .clause-body { line-height: 1.7; }
+  .clause-body p  { margin: 0 0 .5em; }
+  .clause-body ul, .clause-body ol { padding-right: 1.2em; margin: .4em 0; }
+  .clause-body h2 { font-size: ${fontSize + 2}pt; font-weight: bold; margin: .6em 0 .3em; }
+  .clause-body h3 { font-size: ${fontSize + 1}pt; font-weight: 600; margin: .5em 0 .2em; }
 </style>
 </head>
 <body>
   <h1>${title}</h1>
   ${clauses.map((c) => `
     <div class="clause">
-      <p class="clause-title">${escapeHtml(c.position + '. ' + (c.title || ''))}</p>
-      <p>${escapeHtml(c.content).replace(/\n/g, '<br>')}</p>
+      <p class="clause-num">${escapeHtml(String(c.position) + '. ' + (c.title || ''))}</p>
+      <div class="clause-body">${c.content || ''}</div>
     </div>
   `).join('')}
 </body>
