@@ -275,6 +275,118 @@
   line-height: 1.6;
 }
 
+// ── Clause edit form (inline inside clause-block) ─────────────────────────────
+.clause-edit-form {
+  animation: fadeInUp 0.18s ease both;
+}
+
+// ── Clause block — action buttons & badges ────────────────────────────────────
+.clause-block {
+  &__badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    flex-wrap: wrap;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: auto; // push to the end in RTL context
+    opacity: 0;
+    transition: opacity $transition;
+
+    .clause-block:hover & { opacity: 1; }
+
+    @media (max-width: 600px) { opacity: 1; } // always visible on mobile
+  }
+
+  &__action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 6px;
+    border-radius: $radius-xs;
+    line-height: 1;
+    transition: background $transition;
+
+    &:hover { background: rgba(0,0,0,.06); }
+
+    &--danger:hover { background: rgba($color-danger,.1); }
+  }
+}
+
+// ── Confirm inline widget ──────────────────────────────────────────────────────
+.confirm-inline {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: #fff9f9;
+  border: 1px solid #fecaca;
+  border-radius: $radius-sm;
+  animation: fadeInUp 0.18s ease both;
+
+  &__msg {
+    font-size: 14px;
+    color: $color-text;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+// ── Reject reason prompt ───────────────────────────────────────────────────────
+.reject-prompt {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: #fef2f2;
+  border: 1px dashed #fca5a5;
+  border-radius: $radius-sm;
+  animation: fadeInUp 0.18s ease both;
+
+  input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid $color-border;
+    border-radius: $radius-xs;
+    font-family: 'Heebo', sans-serif;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+
+    &:focus { border-color: $color-danger; box-shadow: 0 0 0 3px rgba($color-danger,.1); }
+  }
+}
+
+// ── Empty state ────────────────────────────────────────────────────────────────
+.contract-section__empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 16px;
+  color: $color-muted;
+  text-align: center;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: $color-muted;
+  }
+}
+
+.contract-section__empty-icon {
+  font-size: 36px;
+  opacity: 0.5;
+}
+
 // ── Participants ───────────────────────────────────────────────────────────────
 .participants-list {
   display: flex;
@@ -285,7 +397,7 @@
 .participant-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
   padding: 10px 14px;
   background: #f8fafc;
   border: 1px solid $color-border;
@@ -294,9 +406,28 @@
 
   &:hover { background: #f1f5f9; }
 
+  &__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $color-primary, $color-secondary);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
   &__name {
     font-size: 14px;
     font-weight: 600;
     color: $color-text;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

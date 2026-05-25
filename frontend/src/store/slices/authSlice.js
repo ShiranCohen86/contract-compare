@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../lib/api';
+import { connectSocket, disconnectSocket } from '../../lib/socket';
 
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
     const { data } = await api.post('/auth/login', credentials);
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
+    connectSocket(data.accessToken);
     return data.user;
   } catch (err) {
     return rejectWithValue(err.response?.data?.error || 'שגיאה בהתחברות');
@@ -17,6 +19,7 @@ export const signup = createAsyncThunk('auth/signup', async (payload, { rejectWi
     const { data } = await api.post('/auth/signup', payload);
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
+    connectSocket(data.accessToken);
     return data.user;
   } catch (err) {
     return rejectWithValue(err.response?.data?.error || 'שגיאה בהרשמה');
@@ -26,6 +29,9 @@ export const signup = createAsyncThunk('auth/signup', async (payload, { rejectWi
 export const fetchMe = createAsyncThunk('auth/fetchMe', async (_, { rejectWithValue }) => {
   try {
     const { data } = await api.get('/auth/me');
+    // Re-connect socket if page was refreshed
+    const token = localStorage.getItem('accessToken');
+    if (token) connectSocket(token);
     return data;
   } catch {
     return rejectWithValue(null);
@@ -36,14 +42,15 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   try { await api.post('/auth/logout'); } catch {}
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
+  disconnectSocket();
 });
 
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user:    null,
-    status:  'idle',
-    error:   null,
+    user:   null,
+    status: 'idle',
+    error:  null,
   },
   reducers: {
     clearError: (state) => { state.error = null; },

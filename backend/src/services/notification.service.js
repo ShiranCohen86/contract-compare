@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
 const Notification = require('../models/Notification');
-const Contract = require('../models/Contract');
 const { paginate } = require('../utils/pagination');
+const { emitToUser } = require('./socket.service');
 
 async function create({ contractId, userId, type, title, body, actionUrl, metadata }) {
-  return Notification.create({ contractId, userId, type, title, body, actionUrl, metadata });
+  const notif = await Notification.create({ contractId, userId, type, title, body, actionUrl, metadata });
+  // Push real-time to the user's personal socket room
+  emitToUser(String(userId), 'notification:new', notif.toObject());
+  return notif;
 }
 
 async function notifyOtherParticipants(contract, senderId, { type, title, body, ...rest }) {

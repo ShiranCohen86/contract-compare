@@ -5,6 +5,7 @@ const FinalApproval = require('../models/FinalApproval');
 const ApiError = require('../utils/ApiError');
 const { assertParticipant, assertNotObserver } = require('./contract.service');
 const notificationService = require('./notification.service');
+const { emitToContract } = require('./socket.service');
 const { paginate } = require('../utils/pagination');
 
 async function listByContract(contractId, userId, query) {
@@ -39,6 +40,9 @@ async function approve(changeId, userId) {
 
   // Apply the change to the clause
   await applyChange(change);
+
+  // Broadcast to everyone in the contract room so all clients refresh
+  emitToContract(String(change.contractId), 'contract:updated', { type: 'change_approved', changeId: String(change._id) });
 
   // Notify proposer
   await notificationService.create({
@@ -76,6 +80,8 @@ async function reject(changeId, userId, reason) {
   // Revert clause state
   await revertPendingState(change);
 
+  emitToContract(String(change.contractId), 'contract:updated', { type: 'change_rejected', changeId: String(change._id) });
+
   // Notify proposer
   await notificationService.create({
     contractId: change.contractId,
@@ -98,6 +104,8 @@ async function withdraw(changeId, userId) {
   await change.save();
 
   await revertPendingState(change);
+
+  emitToContract(String(change.contractId), 'contract:updated', { type: 'change_withdrawn', changeId: String(change._id) });
 
   return change;
 }

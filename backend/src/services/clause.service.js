@@ -4,6 +4,7 @@ const ClauseChange = require('../models/ClauseChange');
 const ApiError = require('../utils/ApiError');
 const { assertParticipant, assertNotObserver } = require('./contract.service');
 const notificationService = require('./notification.service');
+const { emitToContract } = require('./socket.service');
 
 async function setNegotiatingIfNeeded(contract) {
   if (contract.status === 'AWAITING_REVIEW') {
@@ -81,6 +82,7 @@ async function create(contractId, userId, { title, content, position }) {
     });
   }
 
+  emitToContract(String(contractId), 'contract:updated', { type: 'clause_added', clauseId: String(clause._id) });
   return { clause, change };
 }
 
@@ -121,6 +123,7 @@ async function update(clauseId, userId, { title, content }) {
       newTitle:        title?.trim(),
       status:          'APPROVED',
     });
+    emitToContract(String(clause.contractId), 'contract:updated', { type: 'clause_edited', clauseId: String(clause._id) });
     return { clause: updated, change };
   }
 
@@ -146,6 +149,7 @@ async function update(clauseId, userId, { title, content }) {
     clauseId: String(clause._id),
   });
 
+  emitToContract(String(clause.contractId), 'contract:updated', { type: 'clause_edit_proposed', clauseId: String(clause._id) });
   return { clause, change };
 }
 
@@ -198,6 +202,7 @@ async function remove(clauseId, userId) {
     clauseId: String(clause._id),
   });
 
+  emitToContract(String(clause.contractId), 'contract:updated', { type: 'clause_delete_proposed', clauseId: String(clause._id) });
   return { clause, change };
 }
 

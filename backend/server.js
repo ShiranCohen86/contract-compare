@@ -7,6 +7,7 @@ const connectDB = require('./src/config/db');
 const env = require('./src/config/env');
 const logger = require('./src/utils/logger');
 const { seedIfEmpty } = require('./seed/seed');
+const socketService = require('./src/services/socket.service');
 
 async function bootstrap() {
   try {
@@ -46,12 +47,20 @@ async function bootstrap() {
     }
   });
 
+  // Register io so any service module can emit without importing app
+  socketService.setIo(io);
+  app.locals.io = io;
+
   io.on('connection', (socket) => {
     logger.debug('Socket connected', { id: socket.id, userId: socket.userId });
+
+    // Auto-join personal room so services can push directly to this user
+    if (socket.userId) socket.join(`user:${socket.userId}`);
 
     socket.on('contract:join', ({ contractId }) => {
       if (!contractId) return;
       socket.join(`contract:${contractId}`);
+      logger.debug('Socket joined contract room', { contractId, userId: socket.userId });
     });
 
     socket.on('contract:leave', ({ contractId }) => {
@@ -63,9 +72,6 @@ async function bootstrap() {
       logger.debug('Socket disconnected', { id: socket.id });
     });
   });
-
-  // Make io accessible to services via app.locals
-  app.locals.io = io;
 
   httpServer.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
