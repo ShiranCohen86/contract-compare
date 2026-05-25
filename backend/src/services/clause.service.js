@@ -7,8 +7,14 @@ const { assertParticipant, assertNotObserver } = require('./contract.service');
 const notificationService = require('./notification.service');
 const { emitToContract } = require('./socket.service');
 
-// Strip all HTML — clauses are plain text, never rendered as HTML in app
-const sanitize = (str) => (str ? xss(str, { whiteList: {}, stripIgnoreTag: true }) : str);
+// Allow safe formatting tags only — strip scripts, iframes, event handlers
+const SAFE_TAGS = {
+  p: [], strong: [], em: [], u: [], s: [],
+  h2: [], h3: [],
+  ul: [], ol: [], li: [],
+  br: [],
+};
+const sanitize = (str) => (str ? xss(str, { whiteList: SAFE_TAGS, stripIgnoreTag: true, stripIgnoreTagBody: ['script', 'style'] }) : str);
 
 async function setNegotiatingIfNeeded(contract) {
   if (contract.status === 'AWAITING_REVIEW') {

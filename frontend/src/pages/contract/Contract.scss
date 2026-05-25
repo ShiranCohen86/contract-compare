@@ -243,6 +243,23 @@
   }
 }
 
+// Rich HTML content rendered inside clause blocks
+.rich-content {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.7;
+  direction: rtl;
+
+  p  { margin: 0 0 6px; &:last-child { margin-bottom: 0; } }
+  h2 { font-size: 15px; font-weight: 700; margin: 8px 0 4px; }
+  h3 { font-size: 14px; font-weight: 600; margin: 6px 0 3px; }
+  ul, ol { padding-right: 18px; margin: 4px 0; }
+  li { margin-bottom: 3px; }
+  strong { font-weight: 700; }
+  em { font-style: italic; }
+  u  { text-decoration: underline; }
+}
+
 // ── Pending changes ──────────────────────────────────────────────────────────
 .change-item {
   border: 1px solid $color-border;

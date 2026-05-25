@@ -6,6 +6,7 @@ import api from '../../lib/api';
 import { getSocket } from '../../lib/socket';
 import { toast } from '../../lib/toaster';
 import InlineDiff from '../../components/ui/InlineDiff';
+import RichEditor from '../../components/ui/RichEditor';
 import './Contract.scss';
 
 const STATUS_HE = {
@@ -435,11 +436,9 @@ export default function ContractPage() {
             </div>
             <div className="form-group">
               <label>{t('clauseContent')} *</label>
-              <textarea
+              <RichEditor
                 value={clauseForm.content}
-                onChange={(e) => setClauseForm((f) => ({ ...f, content: e.target.value }))}
-                required
-                autoFocus
+                onChange={(html) => setClauseForm((f) => ({ ...f, content: html }))}
                 placeholder="תוכן הסעיף..."
               />
             </div>
@@ -479,11 +478,9 @@ export default function ContractPage() {
                   </div>
                   <div className="form-group">
                     <label>תוכן *</label>
-                    <textarea
+                    <RichEditor
                       value={editForm.content}
-                      onChange={(e) => setEditForm((f) => ({ ...f, content: e.target.value }))}
-                      required
-                      autoFocus
+                      onChange={(html) => setEditForm((f) => ({ ...f, content: html }))}
                     />
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
@@ -519,7 +516,10 @@ export default function ContractPage() {
                       </div>
                     )}
                   </div>
-                  <p className="clause-block__content">{cl.content}</p>
+                  <div
+                    className="clause-block__content rich-content"
+                    dangerouslySetInnerHTML={{ __html: cl.content }}
+                  />
 
                   {/* Delete confirmation inline */}
                   {deletingId === cl._id && (
